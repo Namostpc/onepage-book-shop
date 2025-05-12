@@ -3,13 +3,17 @@ import "../global.css";
 </script>
 
 <template>
-  <div class="navbar bg-base-100 shadow-sm">
-    <div class="flex-1">
-      <a class="btn btn-ghost text-xl ">Book Shop</a>
+  <div className="navbar bg-base-100 shadow-sm">
+    <div className="flex-1">
+      <a className="btn btn-ghost text-xl ">Book Shop</a>
     </div>
-    <div class="flex gap-2">
-      <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
-        <div class="w-10 rounded-full">
+    <div className="flex gap-2">
+      <button className="items-center mr-5 w-9.5 fill-blue-500">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512 ">
+          <path d="M0 24C0 10.7 10.7 0 24 0L69.5 0c22 0 41.5 12.8 50.6 32l411 0c26.3 0 45.5 25 38.6 50.4l-41 152.3c-8.5 31.4-37 53.3-69.5 53.3l-288.5 0 5.4 28.5c2.2 11.3 12.1 19.5 23.6 19.5L488 336c13.3 0 24 10.7 24 24s-10.7 24-24 24l-288.3 0c-34.6 0-64.3-24.6-70.7-58.5L77.4 54.5c-.7-3.8-4-6.5-7.9-6.5L24 48C10.7 48 0 37.3 0 24zM128 464a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm336-48a48 48 0 1 1 0 96 48 48 0 1 1 0-96z"/></svg>
+      </button>
+      <div className="btn btn-ghost btn-circle avatar">
+        <div className="w-10 rounded-full">
           <img
             alt="Tailwind CSS Navbar component"
             src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"

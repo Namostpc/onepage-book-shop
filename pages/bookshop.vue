@@ -17,15 +17,15 @@ const resetFilter = () => {
 <template>
   <Navbar />
   <div className="container flex justify-center w-full px-2 py-3 mt-10">
-    <div className="flex-col w-80">
-      <div v-for="data in bookStore.category" className="form-control mt-5">
+    <div className="flex-col w-80 ">
+      <div v-for="data in bookStore.category" className="form-control mb-5 ">
         <input
           type="checkbox"
-          className="checkbox checkbox-primary checked:border-white"
+          className="checkbox checkbox-primary checked:border-white ml-2"
           :value="data"
           v-model="categoryList"
         />
-        <span classNameNae="ml-5 text-white label-text ">{{ data }}</span>
+        <span className="ml-5 text-white label-text">{{ data }}</span>
       </div>
       <button
         @click="resetFilter()"
@@ -50,7 +50,7 @@ const resetFilter = () => {
             </p>
             <div className="card-actions justify-between text-center mr-2">
               <div className="badge badge-primary cursor-pointer text-m">
-                {{data.price}}
+                ฿{{data.price}}
               </div>
               <div className="badge badge-accent cursor-pointer text-m">
                 Add to cart
