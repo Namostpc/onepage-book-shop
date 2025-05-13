@@ -3,10 +3,11 @@ import { useBookstore } from "~/stores/bookshop";
 import "../assets/css/app.css";
 
 const bookStore = useBookstore();
-const categoryList = ref([]);
 const checkbox_id = 1;
+const body = ref({});
 const page = ref(bookStore.list.length / 2);
 console.log("page ===", page.value);
+console.log("bookStore.cart ===", bookStore.cart);
 
 onMounted(async () => {
   try {
@@ -17,8 +18,10 @@ onMounted(async () => {
   console.log(bookStore.list);
 });
 
-const resetFilter = () => {
-  categoryList.value = [];
+const addToCart = async (body) => {
+  await bookStore.addtoCart(body);
+  console.log("bodyData ==", body);
+  await bookStore.loadData();
 };
 </script>
 
@@ -30,6 +33,17 @@ const resetFilter = () => {
     <div class="flex justify-center items-center text-white">
       <div class="mr-5 text-4xl">
         <Icon name="uil:cart"></Icon>
+      </div>
+      <div v-if="bookStore.cart.length > 0">
+        <div class="relative">
+          <span
+            class="absolute text-gray-700 after:text-red-500 boder boder-white right-4 rounded-full bg-white w-6 h-6"
+          >
+          <p class="flex items-center justify-center font-semibold">
+            {{ bookStore.cart.length}}
+          </p>
+          </span>
+        </div>
       </div>
       <div class="mr-5">
         <NuxtImg
@@ -86,9 +100,7 @@ const resetFilter = () => {
               class="h-50 w-48 object-fill"
             ></NuxtImg>
           </div>
-          <div
-            class="p-5 flex flex-col items-center justify-center h-full"
-          >
+          <div class="p-5 flex flex-col items-center justify-center h-full">
             <h5
               class="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white"
             >
@@ -104,13 +116,20 @@ const resetFilter = () => {
             >
               {{ data.detail }}
             </p>
-            <div class="flex justify-between w-full flex py-2 px-3 items-center">
-              <div class="flex justify-center rounded-full bg-blue-500 min-w-25 text-center text-white h-10 items-center">
-                ${{data.price}}
+            <div
+              class="flex justify-between w-full flex py-2 px-3 items-center"
+            >
+              <div
+                class="flex justify-center rounded-full bg-blue-500 min-w-25 text-center text-white h-10 items-center cursor-pointer"
+              >
+                ${{ data.price }}
               </div>
-              <div class="flex justify-center rounded-full bg-yellow-500 min-w-25 text-center text-white h-10 items-center">
+              <button
+                @click="addToCart(data)"
+                class="flex justify-center rounded-full bg-yellow-500 min-w-25 text-center text-white h-10 items-center cursor-pointer"
+              >
                 Add to Cart
-              </div>
+              </button>
             </div>
           </div>
         </div>

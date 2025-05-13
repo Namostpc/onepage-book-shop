@@ -7,7 +7,8 @@ const baseURL = 'https://api.gameliveball.com/items'
 export const useBookstore = defineStore('bookshop', {
     state: () => ({
         list: [],
-        category: ['All','Programming','Cooking','Art','Finance']
+        category: ['All','Programming','Cooking','Art','Finance'],
+        cart: []
     }),
     actions: {
         async loadData(){
@@ -22,6 +23,17 @@ export const useBookstore = defineStore('bookshop', {
                 console.log('error', error);
             }
             
+        },
+        async addtoCart(bodyData) {
+
+            const Data = {
+                id: bodyData.id,
+                photolink: bodyData.photolink,
+                bookname: bodyData.bookname,
+                detail: bodyData.detail,
+                category: bodyData.category
+            }
+            this.cart.push(Data)
         }
     }
 })
