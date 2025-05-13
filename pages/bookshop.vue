@@ -4,10 +4,31 @@ import "../assets/css/app.css";
 
 const bookStore = useBookstore();
 const checkbox_id = 1;
-const body = ref({});
 const page = ref(bookStore.list.length / 2);
+const countProduct = ref(0);
+const isOpen = ref(false);
+const selectedBook = ref([]);
 console.log("page ===", page.value);
-console.log("bookStore.cart ===", bookStore.cart);
+console.log("selectedBook.cart ===", selectedBook.value);
+
+// {
+//     "id": 1,
+//     "photolink": "https://picsum.photos/id/101/200/300",
+//     "bookname": "The Art of Coding",
+//     "detail": "A comprehensive guide to mastering programming languages.",
+//     "category": "Programming",
+//     "price": 150,
+//     "quality": 0
+// },
+// {
+//     "id": 2,
+//     "photolink": "https://picsum.photos/id/102/200/300",
+//     "bookname": "Mastering Python",
+//     "detail": "Learn Python from basics to advanced concepts.",
+//     "category": "Programming",
+//     "price": 200,
+//     "quality": 0
+// }
 
 onMounted(async () => {
   try {
@@ -21,27 +42,169 @@ onMounted(async () => {
 const addToCart = async (body) => {
   await bookStore.addtoCart(body);
   console.log("bodyData ==", body);
+  selectedBook.value = bookStore.cart;
+  console.log("countProduct ==", countProduct.value);
+
+  console.log("selectedBook ===", selectedBook.value);
+
   await bookStore.loadData();
+};
+
+const shoppingCart = async () => {
+  isOpen.value = true;
+};
+
+const closeCart = async () => {
+  isOpen.value = false;
 };
 </script>
 
 <template>
-  <nav class="flex justify-between bg-gray-800 h-15 items-center">
+  <nav class="flex justify-between bg-gray-800 h-15 items-center z-0">
     <div class="w-full text-2xl ml-4 text-white">
       <h2>Books Shop</h2>
     </div>
     <div class="flex justify-center items-center text-white">
-      <div class="mr-5 text-4xl">
+      <button
+        data-modal-target="cart-modal"
+        data-modal-toggle="cart-modal"
+        type="button"
+        class="mr-5 text-4xl cursor-pointer"
+        @click="shoppingCart()"
+      >
         <Icon name="uil:cart"></Icon>
+      </button>
+      <div>
+        <div v-if="isOpen">
+          <div
+            aria-hidden="true"
+            class="fixed left-0 top-0 bg-black/75 w-screen h-screen flex justify-center items-center z-50"
+          >
+            <div
+              class="relative p-4 w-full max-w-280 max-h-screen border border-white h-screen"
+            >
+              <!-- Modal content -->
+              <div
+                class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700 h-full max-h-400"
+              >
+                <!-- Modal header -->
+                <div class="flex items-center justify-between p-4">
+                  <h3
+                    class="text-xl font-semibold text-gray-900 dark:text-white"
+                  >
+                    Shoping Cart
+                  </h3>
+                  <button
+                    type="button"
+                    class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                    @click="closeCart()"
+                  >
+                    <svg
+                      class="w-3 h-3"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 14 14"
+                    >
+                      <path
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+                      />
+                    </svg>
+                    <span class="sr-only">Close modal</span>
+                  </button>
+                </div>
+                <!-- Modal body -->
+                <div class="p-4 h-full max-h-275 border border-red-700">
+                  <div>
+                    <div class="flow-root">
+                      <ul role="list" class="-my-6 divide-y divide-gray-200">
+                        <li
+                          v-for="product in selectedBook"
+                          :key="product.id"
+                          class="flex py-6"
+                        >
+                          <div
+                            class="size-36 shrink-0 overflow-hidden rounded-md border border-gray-200"
+                          >
+                            <NuxtImg
+                              :src="product.photolink"
+                              class="size-full object-cover"
+                            />
+                          </div>
+
+                          <div class="ml-4 flex flex-1 flex-col">
+                            <div>
+                              <div
+                                class="flex justify-between text-base font-medium text-white text-xl"
+                              >
+                                <h3>
+                                  {{ product.bookname }}
+                                </h3>
+                                <div
+                                  class="flex text-center items-center border border-red-700 w-20 h-10 rounded-full bg-green-500"
+                                >
+                                  <p class="ml-4">฿{{ product.price }}</p>
+                                </div>
+                              </div>
+                            </div>
+                            <div
+                              class="flex flex-1 items-end justify-between text-sm"
+                            >
+                              <p class="text-white">
+                                Qty {{ product.quality }}
+                              </p>
+
+                              <div class="flex">
+                                <button
+                                  type="button"
+                                  class="font-medium text-3xl text-red-500 cursor-pointer"
+                                >
+                                  <Icon name="icomoon-free:bin"></Icon>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                <!-- Modal footer -->
+                <div
+                  class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600"
+                >
+                  <button
+                    data-modal-hide="default-modal"
+                    type="button"
+                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                  >
+                    I accept
+                  </button>
+                  <button
+                    data-modal-hide="default-modal"
+                    type="button"
+                    class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+                  >
+                    Decline
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div v-if="bookStore.cart.length > 0">
-        <div class="relative">
+      <div v-if="bookStore.selectedAmout > 0">
+        <div class="relative z-0">
           <span
             class="absolute text-gray-700 after:text-red-500 boder boder-white right-4 rounded-full bg-white w-6 h-6"
           >
-          <p class="flex items-center justify-center font-semibold">
-            {{ bookStore.cart.length}}
-          </p>
+            <p class="flex items-center justify-center font-semibold">
+              {{ bookStore.selectedAmout}}
+            </p>
           </span>
         </div>
       </div>
@@ -53,149 +216,90 @@ const addToCart = async (body) => {
       </div>
     </div>
   </nav>
-  <main class="flex">
-    <div class="flex flex-col border w-80 pt-10 h-screen">
-      <div v-for="category in bookStore.category">
-        <div class="flex mt-2 mb-5 mx-3">
-          <label class="flex items-center cursor-pointer relative">
-            <input
-              type="checkbox"
-              class="peer h-5 w-5 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border border-slate-300 checked:bg-blue-600 checked:border-blue-600"
-              id="check1"
-            />
+  <main>
+    <div class="flex z-30">
+      <div class="flex flex-col border w-80 pt-10 h-screen">
+        <div v-for="category in bookStore.category">
+          <div class="flex mt-2 mb-5 mx-3">
+            <label class="flex items-center cursor-pointer relative">
+              <input
+                type="checkbox"
+                class="peer h-5 w-5 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border border-slate-300 checked:bg-blue-600 checked:border-blue-600"
+                id="check1"
+              />
 
-            <span
-              class="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-3.5 w-3.5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                stroke="currentColor"
-                stroke-width="1"
+              <span
+                class="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
               >
-                <path
-                  fill-rule="evenodd"
-                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                  clip-rule="evenodd"
-                ></path>
-              </svg>
-            </span>
-          </label>
-          <div class="text-white ml-5">
-            {{ category }}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-3.5 w-3.5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  stroke="currentColor"
+                  stroke-width="1"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clip-rule="evenodd"
+                  ></path>
+                </svg>
+              </span>
+            </label>
+            <div class="text-white ml-5">
+              {{ category }}
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="grid grid-cols-4 gap-4 pt-10 mx-2">
-      <div v-for="data in bookStore.list">
-        <div
-          class="flex flex-col w-100 max-h-max ml-5 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700"
-        >
-          <div class="py-5 flex justify-center items-center">
-            <NuxtImg
-              :src="data.photolink"
-              class="h-50 w-48 object-fill"
-            ></NuxtImg>
-          </div>
-          <div class="p-5 flex flex-col items-center justify-center h-full">
-            <h5
-              class="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white"
-            >
-              {{ data.bookname }}
-            </h5>
-            <div
-              class="flex justify-center items-center w-35 text-white my-2 text-m min-h-8 text-center rounded-full bg-pink-500"
-            >
-              {{ data.category }}
+      <div class="grid grid-cols-4 gap-4 pt-10 mx-2">
+        <div v-for="data in bookStore.list">
+          <div
+            class="flex flex-col w-100 max-h-max ml-5 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700"
+          >
+            <div class="py-5 flex justify-center items-center">
+              <NuxtImg
+                :src="data.photolink"
+                class="h-50 w-48 object-fill"
+              ></NuxtImg>
             </div>
-            <p
-              class="flex px-2 py-2 mb-3 font-normal text-center items-center text-white h-25"
-            >
-              {{ data.detail }}
-            </p>
-            <div
-              class="flex justify-between w-full flex py-2 px-3 items-center"
-            >
+            <div class="p-5 flex flex-col items-center justify-center h-full">
+              <h5
+                class="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white"
+              >
+                {{ data.bookname }}
+              </h5>
               <div
-                class="flex justify-center rounded-full bg-blue-500 min-w-25 text-center text-white h-10 items-center cursor-pointer"
+                class="flex justify-center items-center w-35 text-white my-2 text-m min-h-8 text-center rounded-full bg-pink-500"
               >
-                ${{ data.price }}
+                {{ data.category }}
               </div>
-              <button
-                @click="addToCart(data)"
-                class="flex justify-center rounded-full bg-yellow-500 min-w-25 text-center text-white h-10 items-center cursor-pointer"
+              <p
+                class="flex px-2 py-2 mb-3 font-normal text-center items-center text-white h-25"
               >
-                Add to Cart
-              </button>
+                {{ data.detail }}
+              </p>
+              <div
+                class="flex justify-between w-full flex py-2 px-3 items-center"
+              >
+                <div
+                  class="flex justify-center rounded-full bg-blue-500 min-w-25 text-center text-white h-10 items-center cursor-pointer"
+                >
+                  ฿{{ data.price }}
+                </div>
+                <button
+                  @click="addToCart(data)"
+                  :click="data.quality += 1"
+                  class="flex justify-center rounded-full bg-yellow-500 min-w-25 text-center text-white h-10 items-center cursor-pointer"
+                >
+                  Add to Cart
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
   </main>
-
-  <!-- <div className="navbar bg-base-100 shadow-sm">
-    <div className="flex-1">
-      <a className="btn btn-ghost text-xl ">Book Shop</a>
-    </div>
-    <div className="flex gap-2">
-      <div class="w-10 mr-2 cursor-pointer">
-        <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24"><path fill="currentColor" d="M19 7h-3V6a4 4 0 0 0-8 0v1H5a1 1 0 0 0-1 1v11a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V8a1 1 0 0 0-1-1m-9-1a2 2 0 0 1 4 0v1h-4Zm8 13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V9h2v1a1 1 0 0 0 2 0V9h4v1a1 1 0 0 0 2 0V9h2Z"></path></svg>
-      </div>
-      <div className="btn btn-ghost btn-circle avatar">
-        <div className="w-10 rounded-full">
-          <NuxtImg src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"></NuxtImg>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div className="container flex w-full px-2 py-3 mt-10 border">
-    <div className="flex-col w-80 ">
-      <div v-for="data in bookStore.category" className="form-control mb-5 ">
-        <input
-          type="checkbox"
-          className="checkbox checkbox-primary checked:border-white ml-2"
-          :value="data"
-          name="checkbox"
-          v-model="categoryList"
-        />
-        <span className="ml-5 text-white label-text">{{ data }}</span>
-      </div>
-      <button
-        @click="resetFilter()"
-        className="my-6 px-4 w-fit btn bg-transparent border-white border-2 text-white hover:bg-primary hover:border-white rounded-full"
-      >
-        Reset Filter
-      </button>
-    </div> -->
-  <!-- <div className="grid grid-cols-4 gap-5 w-full">
-      <div v-for="data in bookStore.list">
-        <div className="card bg-base-80 w-80 shadow-sm">
-          <figure>
-            <NuxtImg :src="data.photolink"></NuxtImg>
-          </figure>
-          <div className="card-body">
-            <h2 className="card-title flex-col">
-              {{ data.bookname }}
-              <div className="badge badge-secondary">{{ data.category }}</div>
-            </h2>
-            <p className="mt-3 px-2 py-2 w-full h-20">
-              {{ data.detail }}
-            </p>
-            <div className="card-actions justify-between text-center mr-2">
-              <div className="badge badge-primary cursor-pointer text-m">
-                ฿{{data.price}}
-              </div>
-              <div className="badge badge-accent cursor-pointer text-m">
-                Add to cart
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div> -->
-  <!-- </div>  -->
 </template>
