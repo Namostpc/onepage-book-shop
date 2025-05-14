@@ -43,10 +43,8 @@ const addToCart = async (body) => {
   await bookStore.addtoCart(body);
   console.log("bodyData ==", body);
   selectedBook.value = bookStore.cart;
-  console.log("countProduct ==", countProduct.value);
-
-  console.log("selectedBook ===", selectedBook.value);
-
+  console.log('selectedBook.value ==', selectedBook.value);
+  
   await bookStore.loadData();
 };
 
@@ -57,10 +55,22 @@ const shoppingCart = async () => {
 const closeCart = async () => {
   isOpen.value = false;
 };
+
+const payCart = async () => {
+  isOpen.value = false;
+  bookStore.cart = []
+}
+
+const removeProduct = async (id) => {
+  await bookStore.removeProduct(id)
+  await bookStore.loadData();
+}
 </script>
 
 <template>
-  <nav class="flex justify-between bg-gray-800 h-15 items-center z-0">
+  <nav
+    class="flex justify-between w-full bg-gray-800 h-15 items-center z-40"
+  >
     <div class="w-full text-2xl ml-4 text-white">
       <h2>Books Shop</h2>
     </div>
@@ -81,13 +91,11 @@ const closeCart = async () => {
             class="fixed left-0 top-0 bg-black/75 w-screen h-screen flex justify-center items-center z-50"
           >
             <div
-              class="relative p-4 w-full max-w-280 max-h-screen border border-white h-screen"
+              class="relative p-4 w-full max-w-200 max-h-screen h-screen"
             >
-              <!-- Modal content -->
               <div
                 class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700 h-full max-h-400"
               >
-                <!-- Modal header -->
                 <div class="flex items-center justify-between p-4">
                   <h3
                     class="text-xl font-semibold text-gray-900 dark:text-white"
@@ -117,8 +125,7 @@ const closeCart = async () => {
                     <span class="sr-only">Close modal</span>
                   </button>
                 </div>
-                <!-- Modal body -->
-                <div class="p-4 h-full max-h-275 border border-red-700">
+                <div class="p-4 h-full max-h-200 overflow-y-auto">
                   <div>
                     <div class="flow-root">
                       <ul role="list" class="-my-6 divide-y divide-gray-200">
@@ -154,12 +161,13 @@ const closeCart = async () => {
                             <div
                               class="flex flex-1 items-end justify-between text-sm"
                             >
-                              <p class="text-white">
-                                Qty {{ product.quality }}
+                              <p class="text-white text-xl">
+                                Qty x {{ product.quality }}
                               </p>
 
                               <div class="flex">
                                 <button
+                                  @click="removeProduct(product.id)"
                                   type="button"
                                   class="font-medium text-3xl text-red-500 cursor-pointer"
                                 >
@@ -173,23 +181,31 @@ const closeCart = async () => {
                     </div>
                   </div>
                 </div>
+                <div class="flex justify-between p-4 mt-10">
+                  <h1 class="text-2xl font-extrabold">
+                    Subtotal
+                  </h1>
+                  <h1 class="text-2xl font-extrabold">
+                    ฿{{ bookStore.summaryPriceCart }}
+                  </h1>
+                </div>
                 <!-- Modal footer -->
                 <div
-                  class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600"
+                  class="flex flex-col items-center overflow-hidden p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600"
                 >
                   <button
-                    data-modal-hide="default-modal"
+                    @click="payCart()"
                     type="button"
-                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                    class="text-white mt-5 text-xl bg-blue-700 w-full max-h-max hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                   >
-                    I accept
+                    Check out
                   </button>
                   <button
-                    data-modal-hide="default-modal"
+                    @click="closeCart()"
                     type="button"
-                    class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+                    class="text-white mt-5 text-xl bg-blue-700 w-full max-h-max hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                   >
-                    Decline
+                    Continue shopping
                   </button>
                 </div>
               </div>
@@ -197,13 +213,13 @@ const closeCart = async () => {
           </div>
         </div>
       </div>
-      <div v-if="bookStore.selectedAmout > 0">
+      <div v-if="selectedBook.length > 0">
         <div class="relative z-0">
           <span
-            class="absolute text-gray-700 after:text-red-500 boder boder-white right-4 rounded-full bg-white w-6 h-6"
+            class="absolute text-gray-700 after:text-red-500 right-4 rounded-full bg-white w-6 h-6"
           >
             <p class="flex items-center justify-center font-semibold">
-              {{ bookStore.selectedAmout}}
+              {{ bookStore.selectedAmout }}
             </p>
           </span>
         </div>
@@ -218,7 +234,7 @@ const closeCart = async () => {
   </nav>
   <main>
     <div class="flex z-30">
-      <div class="flex flex-col border w-80 pt-10 h-screen">
+      <div class="flex flex-col w-80 pt-10 h-screen  lg:flex flex-col">
         <div v-for="category in bookStore.category">
           <div class="flex mt-2 mb-5 mx-3">
             <label class="flex items-center cursor-pointer relative">
@@ -253,10 +269,10 @@ const closeCart = async () => {
           </div>
         </div>
       </div>
-      <div class="grid grid-cols-4 gap-4 pt-10 mx-2">
+      <div class="flex flex-wrap p-10 mx-2 justify-center items-center ">
         <div v-for="data in bookStore.list">
           <div
-            class="flex flex-col w-100 max-h-max ml-5 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700"
+            class="flex flex-col w-100 mb-5 mx-8 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700"
           >
             <div class="py-5 flex justify-center items-center">
               <NuxtImg
@@ -290,7 +306,7 @@ const closeCart = async () => {
                 </div>
                 <button
                   @click="addToCart(data)"
-                  :click="data.quality += 1"
+                  :click="(data.quality += 1)"
                   class="flex justify-center rounded-full bg-yellow-500 min-w-25 text-center text-white h-10 items-center cursor-pointer"
                 >
                   Add to Cart

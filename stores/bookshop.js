@@ -8,8 +8,11 @@ export const useBookstore = defineStore("bookshop", {
     list: [],
     category: ["All", "Programming", "Cooking", "Art", "Finance"],
     cart: [],
-    selectedAmout: 0
+    selectedAmout: 0,
   }),
+  getters:{
+    summaryPriceCart: (state) => state.cart.reduce((total,item) => total + (item.price * item.quality),0),
+  },
   actions: {
     async loadData() {
       try {
@@ -35,16 +38,22 @@ export const useBookstore = defineStore("bookshop", {
       };
 
       const existingItem = this.cart.findIndex((item) => item.id === data.id)
-
       if (existingItem > -1){
         this.cart[existingItem].quality++
         this.selectedAmout++
+        
       }else {
         this.cart.push(data);
         this.selectedAmout++
       }
-
-      
     },
+
+    async removeProduct(id) {
+        const existingItem = this.cart.findIndex((item) => item.id === id)
+        if (existingItem > -1){
+            this.cart.splice(existingItem,1)
+            this.selectedAmout--
+        }
+    }
   },
 });
