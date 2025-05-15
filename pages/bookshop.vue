@@ -8,8 +8,17 @@ const page = ref(bookStore.list.length / 2);
 const countProduct = ref(0);
 const isOpen = ref(false);
 const selectedBook = ref([]);
+const selectedCategory = ref({})
+console.log('selectedCategory ==', selectedCategory.value);
+
 console.log("page ===", page.value);
 console.log("selectedBook.cart ===", selectedBook.value);
+
+const filterCategoryList = computed(() => {
+  return bookStore.list.filter((list) => list.category === selectedCategory.value);
+});
+console.log('filterCategoryList ===', filterCategoryList.value);
+
 
 // {
 //     "id": 1,
@@ -64,6 +73,19 @@ const payCart = async () => {
 const removeProduct = async (id) => {
   await bookStore.removeProduct(id)
   await bookStore.loadData();
+}
+
+const onChangeCategory = async (newCategory) => {
+  if (newCategory === 'All') {
+    selectedCategory.value = {}
+  }else {
+    selectedCategory.value = (newCategory)
+
+  }
+
+  
+  console.log('selectedCategory.value ===', selectedCategory.value);
+  
 }
 </script>
 
@@ -240,6 +262,8 @@ const removeProduct = async (id) => {
             <label class="flex items-center cursor-pointer relative">
               <input
                 type="checkbox"
+                :checked="category === 'All'"
+                @change="onChangeCategory(category)"
                 class="peer h-5 w-5 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border border-slate-300 checked:bg-blue-600 checked:border-blue-600"
                 id="check1"
               />
@@ -270,7 +294,52 @@ const removeProduct = async (id) => {
         </div>
       </div>
       <div class="flex flex-wrap p-10 mx-2 justify-center items-center ">
-        <div v-for="data in bookStore.list">
+        <div v-for="data in filterCategoryList" v-if="selectedCategory.length > 0">
+          <div
+            class="flex flex-col w-100 mb-5 mx-8 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700"
+          >
+            <div class="py-5 flex justify-center items-center">
+              <NuxtImg
+                :src="data.photolink"
+                class="h-50 w-48 object-fill"
+              ></NuxtImg>
+            </div>
+            <div class="p-5 flex flex-col items-center justify-center h-full">
+              <h5
+                class="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white"
+              >
+                {{ data.bookname }}
+              </h5>
+              <div
+                class="flex justify-center items-center w-35 text-white my-2 text-m min-h-8 text-center rounded-full bg-pink-500"
+              >
+                {{ data.category }}
+              </div>
+              <p
+                class="flex px-2 py-2 mb-3 font-normal text-center items-center text-white h-25"
+              >
+                {{ data.detail }}
+              </p>
+              <div
+                class="flex justify-between w-full flex py-2 px-3 items-center"
+              >
+                <div
+                  class="flex justify-center rounded-full bg-blue-500 min-w-25 text-center text-white h-10 items-center cursor-pointer"
+                >
+                  ฿{{ data.price }}
+                </div>
+                <button
+                  @click="addToCart(data)"
+                  :click="(data.quality += 1)"
+                  class="flex justify-center rounded-full bg-yellow-500 min-w-25 text-center text-white h-10 items-center cursor-pointer"
+                >
+                  Add to Cart
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div v-else v-for="data in bookStore.list">
           <div
             class="flex flex-col w-100 mb-5 mx-8 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700"
           >
